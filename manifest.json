@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Bib Kit",
+  "version": "1.0",
+  "description": "Instantly create hayagriva bibliography items from websites.",
+  "icons": {
+    "48": "icons/book-48.png"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; default-src 'self';"
+  },
+  "action": {
+    "default_icon": "icons/book-48.png",
+    "default_title": "Bib Kit",
+    "default_popup": "popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "type": "module"
+  }
+}
