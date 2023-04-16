@@ -20,8 +20,24 @@ impl Document {
     }
 
     pub fn find_key(&self) -> HlpResult<String> {
-        // TODO
-        self.find_title().map(|title| title.canonical.value)
+        // TODO add author to key if found
+        self.find_title().map(|title| {
+            let mut key = title.canonical.value;
+            key.make_ascii_lowercase();
+            let mut splitted_key = key.trim().split_whitespace().enumerate();
+
+            let mut key = String::new();
+            while let Some((counter, part)) = splitted_key.next() {
+                key.push_str(part);
+                key.push('-');
+
+                if counter == 3 {
+                    break;
+                }
+            }
+            key.pop();
+            key
+        })
     }
 
     pub fn find_entry_type(&self) -> HlpResult<EntryType> {
@@ -135,6 +151,14 @@ mod test {
     </html>"#;
 
     #[test]
+    fn document_find_key() {
+        let doc = Document::parse(EXAMPLE_HTML, "http://example.com/").unwrap();
+
+        let key = doc.find_key().unwrap();
+        assert_eq!(key, "example-domain");
+    }
+
+    #[test]
     fn document_find_title() {
         let doc = Document::parse(EXAMPLE_HTML, "http://example.com/").unwrap();
 
@@ -157,7 +181,7 @@ mod test {
         let entry = Entry::try_from(doc).unwrap();
 
         let url = Url::parse("https://example.com").unwrap();
-        let mut expected = Entry::new("Example Domain", EntryType::Web);
+        let mut expected = Entry::new("example-domain", EntryType::Web);
         expected.set_title(Title::new("Example Domain"));
         expected.set_url(QualifiedUrl {
             visit_date: Some(super::now()),

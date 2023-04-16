@@ -1,5 +1,6 @@
 use scraper::error::SelectorErrorKind;
 use thiserror::Error;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Debug, Error)]
 pub enum HlpError {

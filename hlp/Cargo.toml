@@ -18,6 +18,7 @@ hayagriva = "0.3.0"
 url = "2.3"
 chrono = { version = "0.4", features = [ "wasmbind" ] }
 console_error_panic_hook = "0.1.7"
+wasm-bindgen = "0.2.84"
 
 [package.metadata.wasm-pack]
 wasm-opt = false
