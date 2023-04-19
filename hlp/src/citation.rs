@@ -4,7 +4,9 @@ use hayagriva::{
 };
 use unic_langid::LanguageIdentifier;
 
-use crate::DataReport;
+use crate::{date::DateIso8601, DataReport};
+
+pub const PLACEHOLDER: &'static str = "placeholder";
 
 pub struct CitationBuilder {
     key: String,
@@ -24,9 +26,83 @@ pub struct CitationBuilder {
     note: Option<String>,
 }
 
+impl CitationBuilder {
+    pub fn new(report: DataReport) -> Self {
+        Self::from(report)
+    }
+
+    pub fn build(self) -> Entry {
+        Entry::from(self)
+    }
+}
+
+// TODO transform data earlier at the relevant sections in ogp_meta generic_meta etc.
 impl From<DataReport> for CitationBuilder {
     fn from(report: DataReport) -> Self {
-        todo!()
+        let DataReport {
+            key,
+            kind,
+            title,
+            note,
+            language,
+            authors,
+            url,
+        } = report;
+
+        let key = match key {
+            Some(key) => key,
+            None => title
+                .as_ref()
+                .map(|title| calculate_key(title))
+                .unwrap_or(PLACEHOLDER.to_owned()),
+        };
+
+        let entry_type = EntryType::Web;
+
+        let title = title.map(|title| Title {
+            canonical: title.into(),
+            shorthand: None,
+            translated: None,
+        });
+
+        let authors = match authors {
+            Some(authors) => authors
+                .into_iter()
+                .map(|author| Person {
+                    name: author,
+                    given_name: None,
+                    prefix: None,
+                    suffix: None,
+                    alias: None,
+                })
+                .collect(),
+            None => Vec::new(),
+        };
+
+        let url = url.map(|url| QualifiedUrl {
+            value: url,
+            visit_date: Some(DateIso8601::now().into()),
+        });
+
+        // let language = language.map(|lang| LanguageIdentifier::from_str(&lang))
+
+        Self {
+            key,
+            entry_type,
+            title,
+            authors,
+            date: None,
+            editors: Vec::new(),
+            affiliated_persons: Vec::new(),
+            publisher: None,
+            location: None,
+            organization: None,
+            url,
+            serial_number: None,
+            isbn: None,
+            language: None,
+            note,
+        }
     }
 }
 
@@ -99,24 +175,20 @@ impl From<CitationBuilder> for Entry {
     }
 }
 
-// impl TryFrom<Document> for Entry {
-//     type Error = HlpError;
+fn calculate_key(title: &str) -> String {
+    // TODO add author to key if found
+    let key = title.to_ascii_lowercase();
+    let mut splitted_key = key.trim().split_whitespace().enumerate();
 
-//     fn try_from(doc: Document) -> Result<Self, Self::Error> {
-//         let key = doc.find_key()?;
-//         let entry_type = doc.find_entry_type()?;
+    let mut key = String::new();
+    while let Some((counter, part)) = splitted_key.next() {
+        key.push_str(part);
+        key.push('-');
 
-//         let mut entry = Entry::new(&key, entry_type);
-
-//         entry.set_url(QualifiedUrl {
-//             value: doc.url.clone(),
-//             visit_date: Some(now()),
-//         });
-
-//         if let Ok(title) = doc.find_title() {
-//             entry.set_title(title)
-//         }
-
-//         Ok(entry)
-//     }
-// }
+        if counter == 3 {
+            break;
+        }
+    }
+    key.pop();
+    key
+}

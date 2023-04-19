@@ -1,24 +1,6 @@
 use crate::error::HlpResult;
 use scraper::{Html, Selector};
 
-pub fn calculate_key(title: &str) -> String {
-    // TODO add author to key if found
-    let key = title.to_ascii_lowercase();
-    let mut splitted_key = key.trim().split_whitespace().enumerate();
-
-    let mut key = String::new();
-    while let Some((counter, part)) = splitted_key.next() {
-        key.push_str(part);
-        key.push('-');
-
-        if counter == 3 {
-            break;
-        }
-    }
-    key.pop();
-    key
-}
-
 pub fn find_title(html: &Html) -> HlpResult<Option<String>> {
     // TODO selector for <title>
     let selector = Selector::parse("h1")?;
@@ -29,16 +11,14 @@ pub fn find_title(html: &Html) -> HlpResult<Option<String>> {
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct HtmlQueryReport {
-    pub key: Option<String>,
     pub title: Option<String>,
 }
 
 impl HtmlQueryReport {
     pub fn from(html: &Html) -> HlpResult<Self> {
         let title = find_title(html)?;
-        let key = title.as_ref().map(|title| calculate_key(title));
 
-        Ok(Self { title, key })
+        Ok(Self { title })
     }
 }
 
@@ -102,7 +82,6 @@ mod test {
 
         let expected = HtmlQueryReport {
             title: Some("Example Domain".to_owned()),
-            key: Some("example-domain".to_owned()),
         };
         assert_eq!(report, expected);
     }

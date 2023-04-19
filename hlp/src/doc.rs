@@ -2,7 +2,7 @@ use crate::{
     error::HlpResult,
     meta::{generic::GenericMetadata, ogp::OgpMetadata},
     query::HtmlQueryReport,
-    DataReport,
+    DataReport, DataReportBuilder,
 };
 use scraper::{Html, Selector};
 use url::Url;
@@ -43,10 +43,13 @@ impl Document {
         let ogp_metadata = self.ogp_metadata()?;
         let html_query_report = self.html_query_report()?;
 
-        Ok(DataReport {
-            generic_metadata,
-            ogp_metadata,
-            html_query_report,
-        })
+        let report = DataReportBuilder::new()
+            .with_url(self.url.clone())
+            .with_generic_metadata(generic_metadata)
+            .with_ogp_metadata(ogp_metadata)
+            .with_html_query_report(html_query_report)
+            .build();
+
+        Ok(report)
     }
 }
