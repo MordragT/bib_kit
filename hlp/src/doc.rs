@@ -1,10 +1,13 @@
+use std::str::FromStr;
+
 use crate::error::{HlpError, HlpResult};
-use chrono::{Datelike, Utc};
+use chrono::{DateTime, Datelike, FixedOffset, ParseError, Utc};
 use hayagriva::{
     types::{Date, EntryType, QualifiedUrl, Title},
     Entry,
 };
-use scraper::{Html, Selector};
+use mime::Mime;
+use scraper::{ElementRef, Html, Selector};
 use url::Url;
 
 pub struct Document {
@@ -18,6 +21,32 @@ impl Document {
         let url = Url::parse(url)?;
         Ok(Self { html, url })
     }
+
+    // pub fn ogp_metadata<'a>(&'a self) -> HlpResult<impl Iterator<Item = ElementRef<'a>> + 'a> {
+    //     let selector = Selector::parse("meta")?;
+
+    //     Ok(self.html.select(&selector))
+    // }
+
+    // pub fn meta_content_select<T: FromStr>(&self, selector: &Selector) -> Option<T> {
+    //     self.html.select(selector).next().and_then(|el| {
+    //         let content = el.value().attr("content")?;
+    //         content.parse::<T>().ok()
+    //     })
+    // }
+
+    // pub fn meta_content_select<'a, T: FromStr>(
+    //     &'a self,
+    //     selector: &'a Selector,
+    // ) -> impl Iterator<Item = T> + 'a {
+    //     self.html
+    //         .select(selector)
+    //         .map(|el| el.value().attr("content"))
+    //         .filter_map(|attr| match attr {
+    //             Some(attr) => attr.parse::<T>().ok(),
+    //             None => None,
+    //         })
+    // }
 
     pub fn find_key(&self) -> HlpResult<String> {
         // TODO add author to key if found

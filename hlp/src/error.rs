@@ -1,6 +1,5 @@
 use scraper::error::SelectorErrorKind;
 use thiserror::Error;
-use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Debug, Error)]
 pub enum HlpError {
@@ -10,6 +9,10 @@ pub enum HlpError {
     UrlParse(#[from] url::ParseError),
     #[error("Title not Found")]
     TitleNotFound,
+    #[error("No extraction target")]
+    NoExtractionTarget,
+    #[error("Extraction content not found")]
+    ExtractionContentNotFound,
 }
 
 pub type HlpResult<T> = Result<T, HlpError>;
