@@ -101,11 +101,6 @@ pub enum OgpMetadataItem {
 }
 
 impl MetadataItem for OgpMetadataItem {
-    fn matches(&self, el: &ElementRef) -> HlpResult<bool> {
-        let selector = self.selector()?;
-        Ok(selector.matches(el))
-    }
-
     fn selector(&self) -> HlpResult<Selector> {
         let selector = match self {
             Self::Title => Selector::parse("meta[property=\"og:title\"]"),
