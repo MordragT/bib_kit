@@ -20,6 +20,7 @@ chrono = { version = "0.4", features = [ "wasmbind" ] }
 console_error_panic_hook = "0.1.7"
 wasm-bindgen = "0.2.84"
 mime = "0.3"
+unic-langid = "0.9.1"
 
 [package.metadata.wasm-pack]
 wasm-opt = false

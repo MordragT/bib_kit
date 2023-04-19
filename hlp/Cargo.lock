@@ -335,6 +335,7 @@ dependencies = [
  "mime",
  "scraper",
  "thiserror",
+ "unic-langid",
  "url",
  "wasm-bindgen",
 ]

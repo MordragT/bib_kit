@@ -13,6 +13,8 @@ pub enum HlpError {
     NoExtractionTarget,
     #[error("Extraction content not found")]
     ExtractionContentNotFound,
+    #[error("MimeFrom Str Error: {0}")]
+    MimeFromStr(#[from] mime::FromStrError),
 }
 
 pub type HlpResult<T> = Result<T, HlpError>;

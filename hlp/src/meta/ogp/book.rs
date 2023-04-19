@@ -1,4 +1,4 @@
-use crate::DateIso8601;
+use crate::date::DateIso8601;
 
 #[derive(Debug)]
 pub struct OgpBook {
