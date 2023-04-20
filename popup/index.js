@@ -1,4 +1,4 @@
-import init, { generate_citation } from "../hlp/pkg/hlp.js"
+import init, { generate_citation } from "../html-meta/pkg/html_meta.js"
 
 function registerCopyHandler() {
     console.log("register copy handler")

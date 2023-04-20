@@ -4,13 +4,14 @@
 <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="tailwind.css" />
 </head>
 
-<body>
-    <div id="popup-content">
-        <button id="copy">Copy</button>
-        <textarea id="text" rows="16" cols="64">
-        </textarea>
+<body class="bg-stone-900">
+    <div id="popup-content" class="text-lg p-6 grid grid-cols-1">
+        <h1 class="text-stone-100 p-4">Bib Kit</h1>
+        <textarea id="text" rows="12" cols="32" class="bg-stone-800 text-stone-100 p-2 rounded"></textarea>
+        <button id="copy" class="bg-amber-800 hover:bg-amber-700 text-white px-4 py-2 rounded mt-4">Copy</button>
     </div>
     <div id="error-content" class="hidden">
         <p>Can't generate bibliography.</p>
