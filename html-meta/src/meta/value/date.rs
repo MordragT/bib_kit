@@ -1,16 +1,16 @@
 use std::str::FromStr;
 
-use chrono::{DateTime, Datelike, FixedOffset, ParseError, Utc};
+use chrono::{DateTime, Datelike, FixedOffset, Local, ParseError};
 use hayagriva::types::Date;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct DateIso8601 {
     date_time: DateTime<FixedOffset>,
 }
 
 impl DateIso8601 {
     pub fn now() -> Self {
-        let date_time = Utc::now().into();
+        let date_time = Local::now().into();
 
         Self { date_time }
     }

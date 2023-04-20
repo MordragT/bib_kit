@@ -1,7 +1,7 @@
-use crate::error::HlpResult;
+use crate::{error::MetaResult, meta::value::Title};
 use scraper::{Html, Selector};
 
-pub fn find_title(html: &Html) -> HlpResult<Option<String>> {
+pub fn find_title(html: &Html) -> MetaResult<Option<String>> {
     // TODO selector for <title>
     let selector = Selector::parse("h1")?;
 
@@ -11,12 +11,13 @@ pub fn find_title(html: &Html) -> HlpResult<Option<String>> {
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct HtmlQueryReport {
-    pub title: Option<String>,
+    pub title: Option<Title>,
 }
 
 impl HtmlQueryReport {
-    pub fn from(html: &Html) -> HlpResult<Self> {
+    pub fn from(html: &Html) -> MetaResult<Self> {
         let title = find_title(html)?;
+        let title = title.map(Title::from);
 
         Ok(Self { title })
     }
@@ -25,6 +26,8 @@ impl HtmlQueryReport {
 #[cfg(test)]
 mod test {
     use scraper::Html;
+
+    use crate::meta::value::Title;
 
     use super::HtmlQueryReport;
 
@@ -81,7 +84,7 @@ mod test {
         let report = HtmlQueryReport::from(&html).unwrap();
 
         let expected = HtmlQueryReport {
-            title: Some("Example Domain".to_owned()),
+            title: Some(Title::new("Example Domain")),
         };
         assert_eq!(report, expected);
     }
