@@ -4,7 +4,13 @@
   "version": "0.1",
   "description": "Instantly create hayagriva bibliography items from websites.",
   "icons": {
-    "48": "icons/book-48.png"
+    "48": "icons/book.svg",
+    "96": "icons/book.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{a85febca-472c-4ccf-aea0-204fd08feaf9}"
+    }
   },
   "permissions": [
     "activeTab",
@@ -19,7 +25,7 @@
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; default-src 'self';"
   },
   "action": {
-    "default_icon": "icons/book-48.png",
+    "default_icon": "icons/book.svg",
     "default_title": "Bib Kit",
     "default_popup": "popup/index.html"
   },
