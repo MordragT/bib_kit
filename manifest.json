@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bib Kit",
-  "version": "1.0",
+  "version": "0.1",
   "description": "Instantly create hayagriva bibliography items from websites.",
   "icons": {
     "48": "icons/book-48.png"

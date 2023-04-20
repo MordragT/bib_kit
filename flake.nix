@@ -41,10 +41,13 @@
                     complete.rustfmt
                     targets.${target}.latest.rust-std
                   ])
+                  (with nodePackages; [
+                    tailwindcss
+                    web-ext
+                  ])
                   pkg-config
                   openssl
                   wasm-pack
-                  nodePackages.tailwindcss
                   just
                 ] ++ buildInputs;
 

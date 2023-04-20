@@ -3,3 +3,6 @@ css:
 
 watch-css:
     tailwindcss --watch --content popup/*.html --output popup/tailwind.css
+
+build:
+    web-ext build
