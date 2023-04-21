@@ -1,18 +1,17 @@
-console.debug("Running content script")
+console.debug("BIB_KIT:Running content script")
 
-// setTimeout(() => {
-console.debug("Wait for complete loading of page")
+function sendParams() {
+    const dom = document.documentElement.outerHTML
+    const url = window.location.href
 
-const dom = document.documentElement.outerHTML
-const url = window.location.href
+    console.debug(`BIB_KIT:sendParams: ${url}`);
 
-browser.runtime.sendMessage({
-    url: url,
-    dom: dom,
-})
-    .catch(e => `Cannot send citation: ${e.message}`)
+    browser.runtime.sendMessage({
+        url: url,
+        dom: dom,
+    })
+        .catch(e => `Cannot send citation: ${e.message}`)
 
-console.debug("Send params");
+}
 
-// }, 256)
-
+sendParams()

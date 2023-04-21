@@ -1,52 +1,55 @@
 import init, { Citation, Dom } from "../html-meta/pkg/html_meta.js"
 
-function registerCopyHandler() {
-    console.debug("register copy handler")
-    const text = document.getElementById("text")
 
-    document.getElementById("copy").addEventListener("click", e => {
-        navigator.clipboard.writeText(text.textContent)
-    })
+function onCopyHandler() {
+    const text = document.getElementById("text")
+    navigator.clipboard.writeText(text.textContent)
+
 }
 
-async function registerMessageHandler() {
+async function onMessageHandler(message) {
     await init()
-    console.debug("loaded wasm module")
-
-    console.debug("register message handler")
-    browser.runtime.onMessage.addListener(message => {
-        console.debug(message)
-        try {
-            const dom = new Dom(message.dom, message.url)
-            const citation = new Citation(dom)
-            const citation_yml = citation.to_yaml_str()
-            browser.storage.local.set({ citation: citation_yml })
-            loadCitation()
-        } catch (e) {
-            console.error(e)
-        }
-    })
+    try {
+        const dom = new Dom(message.dom, message.url)
+        const citation = new Citation(dom)
+        const citation_yml = citation.to_yaml_str()
+        browser.storage.local.set({ [message.url]: citation_yml })
+        // TODO this runs now twice for instant change of the text field
+        displayCitation(message.url)
+    } catch (e) {
+        console.error(e)
+    }
 }
 
-function loadCitation() {
-    console.debug("load citation")
+function displayCitation(idx) {
+    console.debug(`displayCitation: ${idx}`)
     const text = document.getElementById("text")
 
-    browser.storage.local.get("citation").then(obj => {
-        console.debug(obj)
-        if (obj.citation != undefined) {
-            text.textContent = obj.citation
+    browser.storage.local.get().then(citations => {
+        console.debug(citations)
+
+        const citation = citations[idx]
+        if (citation == undefined) {
+            text.textContent = `example:
+            type: Web
+            title: This is a placeholder
+            author: John Doe
+            url: http://example.com`
         } else {
-            const example = `example:
-        type: Web
-        title: This is a placeholder
-        author: John Doe
-        url: http://example.com`
-            text.textContent = example
+            text.textContent = citation
         }
     })
 }
 
-registerCopyHandler()
-registerMessageHandler()
-loadCitation()
+async function getCurrentTabUrl() {
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    return tabs[0].url;
+}
+
+
+
+browser.runtime.onMessage.addListener(onMessageHandler)
+document.getElementById("copy").addEventListener("click", onCopyHandler)
+
+const currentUrl = await getCurrentTabUrl();
+displayCitation(currentUrl)
