@@ -30,7 +30,7 @@ impl Citation {
     #[wasm_bindgen(constructor)]
     pub fn new(dom: Dom) -> MetaResult<Citation> {
         let citation = CitationBuilder::new(dom)
-            .with_html_query_report()?
+            // .with_html_query_report()?
             .with_generic_metadata()?
             .with_ogp_metadata()?
             .build();

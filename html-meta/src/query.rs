@@ -5,7 +5,12 @@ pub fn find_title(html: &Html) -> MetaResult<Option<String>> {
     // TODO selector for <title>
     let selector = Selector::parse("h1")?;
 
-    let title = html.select(&selector).next().map(|el| el.inner_html());
+    let title = html
+        .select(&selector)
+        .next()
+        .map(|el| el.text().next())
+        .flatten()
+        .map(ToOwned::to_owned);
     Ok(title)
 }
 
