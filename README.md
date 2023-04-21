@@ -12,6 +12,10 @@ citations in the `hayagriva` format.
 This extension is highly experimental. Bugs are expected.
 If you encounter any feel free to create issues.
 
+## Screenshot
+
+![Screenshot Medium](screenshots/screenshot_medium.png)
+
 ## Roadmap
 
 - [ ] create more data extractors (e.g. dublin-core)
