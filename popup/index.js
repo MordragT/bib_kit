@@ -51,8 +51,7 @@ async function onMessageHandler(message) {
 browser.runtime.onMessage.addListener(onMessageHandler)
 
 document.getElementById("copy").addEventListener("click", onCopyHandler)
-const currentUrl = await getCurrentTabUrl()
 
-displayStoredCitation(currentUrl)
+getCurrentTabUrl().then(currentUrl => displayStoredCitation(currentUrl))
 
 
