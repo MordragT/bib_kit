@@ -2,7 +2,7 @@ use std::{convert::Infallible, str::FromStr};
 
 use deunicode::deunicode;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Title {
     pub canonical: String,
 }

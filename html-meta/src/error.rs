@@ -4,11 +4,14 @@ use isbn2::IsbnError;
 use scraper::error::SelectorErrorKind;
 use thiserror::Error;
 use unic_langid::LanguageIdentifierError;
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Error)]
 pub enum MetaError {
     #[error("Selector Error: {0}")]
     Selector(#[from] SelectorErrorKind<'static>),
+    #[error("Yaml Parse Error")]
+    YamlParse,
     #[error("Int Parse Error: {0}")]
     IntParse(#[from] ParseIntError),
     #[error("Date Parse Error: {0}")]
@@ -38,6 +41,18 @@ pub enum MetaError {
     #[error("Infallible")]
     Infallible(#[from] Infallible),
 }
+
+impl Into<JsValue> for MetaError {
+    fn into(self) -> JsValue {
+        self.to_string().into()
+    }
+}
+
+// impl From<MetaError> for JsValue {
+//     fn from(err: MetaError) -> Self {
+//         err.to_string().into()
+//     }
+// }
 
 impl From<IsbnError> for MetaError {
     fn from(value: IsbnError) -> Self {

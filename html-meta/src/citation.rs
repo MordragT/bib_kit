@@ -1,24 +1,58 @@
 #![allow(unused_variables)]
 
 use crate::{
+    dom::Dom,
+    error::{MetaError, MetaResult},
     meta::{
         generic::GenericMetadata,
         ogp::{OgpArticle, OgpAudio, OgpBook, OgpImage, OgpMetadata, OgpVideo},
         value::{into_qualified, DateIso8601, Name, Title},
     },
+    priority::PriorityData,
     query::HtmlQueryReport,
-    PriorityData,
 };
-use hayagriva::{types::EntryType, Entry};
+use hayagriva::{io::to_yaml_str, types::EntryType, Entry};
 use isbn2::Isbn;
 use unic_langid::LanguageIdentifier;
 use url::Url;
+use wasm_bindgen::prelude::wasm_bindgen;
 
-pub const PLACEHOLDER: &'static str = "placeholder";
+const PLACEHOLDER: &'static str = "placeholder";
 
-#[derive(Debug)]
+#[wasm_bindgen]
+#[derive(Debug, Clone, PartialEq)]
+pub struct Citation {
+    entry: Entry,
+}
+
+#[wasm_bindgen]
+impl Citation {
+    #[wasm_bindgen(constructor)]
+    pub fn new(dom: Dom) -> MetaResult<Citation> {
+        let citation = CitationBuilder::new(dom)
+            .with_html_query_report()?
+            .with_generic_metadata()?
+            .with_ogp_metadata()?
+            .build();
+
+        Ok(citation)
+    }
+
+    pub fn to_yaml_str(&self) -> MetaResult<String> {
+        to_yaml_str([&self.entry]).ok_or(MetaError::YamlParse)
+    }
+}
+
+impl From<Entry> for Citation {
+    fn from(entry: Entry) -> Self {
+        Self { entry }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CitationBuilder {
     entry_type: EntryType,
+    dom: Dom,
     title: PriorityData<Title>,
     authors: PriorityData<Vec<Name>>,
     date: PriorityData<DateIso8601>,
@@ -34,9 +68,16 @@ pub struct CitationBuilder {
     note: PriorityData<String>,
 }
 
-impl Default for CitationBuilder {
-    fn default() -> Self {
+impl CitationBuilder {
+    pub fn new(dom: Dom) -> Self {
+        let url = PriorityData {
+            first: Some(dom.url().clone()),
+            second: None,
+            third: None,
+        };
+
         Self {
+            dom,
             entry_type: EntryType::Web,
             title: Default::default(),
             authors: Default::default(),
@@ -45,34 +86,25 @@ impl Default for CitationBuilder {
             publisher: Default::default(),
             location: Default::default(),
             organization: Default::default(),
-            url: Default::default(),
+            url,
             serial_number: Default::default(),
             isbn: Default::default(),
             language: Default::default(),
             note: Default::default(),
         }
     }
-}
 
-impl CitationBuilder {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn with_html_query_report(mut self) -> MetaResult<Self> {
+        let HtmlQueryReport { title } = self.dom.html_query_report()?;
+
+        if let Some(title) = title {
+            self.title.third = Some(title);
+        }
+
+        Ok(self)
     }
 
-    pub fn with_url(mut self, url: Url) -> Self {
-        self.url.first = Some(url);
-        self
-    }
-
-    pub fn with_html_query_report(mut self, html_query_report: HtmlQueryReport) -> Self {
-        let HtmlQueryReport { title } = html_query_report;
-
-        self.title.third = title;
-
-        self
-    }
-
-    pub fn with_generic_metadata(mut self, generic_metadata: GenericMetadata) -> Self {
+    pub fn with_generic_metadata(mut self) -> MetaResult<Self> {
         let GenericMetadata {
             title,
             content_type,
@@ -80,16 +112,24 @@ impl CitationBuilder {
             keywords,
             language,
             author,
-        } = generic_metadata;
+        } = self.dom.generic_metadata()?;
 
-        self.title.second = title;
-        self.language.second = language;
-        self.authors.second = author.map(|a| vec![a]);
+        if let Some(title) = title {
+            self.title.second = Some(title);
+        }
 
-        self
+        if let Some(language) = language {
+            self.language.second = Some(language);
+        }
+
+        if let Some(author) = author {
+            self.authors.second = Some(vec![author]);
+        }
+
+        Ok(self)
     }
 
-    pub fn with_ogp_metadata(mut self, ogp_metadata: OgpMetadata) -> Self {
+    pub fn with_ogp_metadata(mut self) -> MetaResult<Self> {
         let OgpMetadata {
             title,
             kind,
@@ -104,11 +144,19 @@ impl CitationBuilder {
             article,
             book,
             profile,
-        } = ogp_metadata;
+        } = self.dom.ogp_metadata()?;
 
-        self.title.first = title;
-        self.url.first = url;
-        self.language.first = locale;
+        if let Some(title) = title {
+            self.title.first = Some(title);
+        }
+
+        if let Some(url) = url {
+            self.url.first = Some(url);
+        }
+
+        if let Some(language) = locale {
+            self.language.first = Some(language);
+        }
 
         let OgpImage {
             url,
@@ -180,17 +228,18 @@ impl CitationBuilder {
             self.isbn.first = Some(isbn);
         }
 
-        self
+        Ok(self)
     }
 
-    pub fn build(self) -> Entry {
-        Entry::from(self)
+    pub fn build(self) -> Citation {
+        Entry::from(self).into()
     }
 }
 
 impl From<CitationBuilder> for Entry {
     fn from(citation: CitationBuilder) -> Self {
         let CitationBuilder {
+            dom: _,
             entry_type,
             title,
             authors,

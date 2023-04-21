@@ -3,7 +3,7 @@ use std::str::FromStr;
 use chrono::{DateTime, Datelike, FixedOffset, Local, ParseError};
 use hayagriva::types::Date;
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct DateIso8601 {
     date_time: DateTime<FixedOffset>,
 }

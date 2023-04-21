@@ -1,25 +1,30 @@
 use crate::{
-    citation::CitationBuilder,
     error::MetaResult,
     meta::{generic::GenericMetadata, ogp::OgpMetadata},
     query::HtmlQueryReport,
 };
-use hayagriva::Entry;
 use scraper::{Html, Selector};
 use url::Url;
+use wasm_bindgen::prelude::wasm_bindgen;
 
-pub struct Document {
+#[wasm_bindgen]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dom {
     html: Html,
     url: Url,
 }
 
-impl Document {
-    pub fn parse(raw: &str, url: &str) -> MetaResult<Self> {
-        let html = Html::parse_document(raw);
+#[wasm_bindgen]
+impl Dom {
+    #[wasm_bindgen(constructor)]
+    pub fn parse(dom: &str, url: &str) -> MetaResult<Dom> {
+        let html = Html::parse_document(dom);
         let url = Url::parse(url)?;
         Ok(Self { html, url })
     }
+}
 
+impl Dom {
     pub fn generic_metadata(&self) -> MetaResult<GenericMetadata> {
         let selector = Selector::parse("meta")?;
         let select = self.html.select(&selector);
@@ -39,18 +44,7 @@ impl Document {
         Ok(report)
     }
 
-    pub fn citation_entry(&self) -> MetaResult<Entry> {
-        let generic_metadata = self.generic_metadata()?;
-        let ogp_metadata = self.ogp_metadata()?;
-        let html_query_report = self.html_query_report()?;
-
-        let report = CitationBuilder::new()
-            .with_url(self.url.clone())
-            .with_generic_metadata(generic_metadata)
-            .with_ogp_metadata(ogp_metadata)
-            .with_html_query_report(html_query_report)
-            .build();
-
-        Ok(report)
+    pub fn url(&self) -> &Url {
+        &self.url
     }
 }

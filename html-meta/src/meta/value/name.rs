@@ -4,7 +4,7 @@ use hayagriva::types::Person;
 
 use crate::error::MetaError;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Name {
     pub surname: String,
     pub given_name: Option<String>,

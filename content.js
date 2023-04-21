@@ -1,18 +1,18 @@
-console.log("Running content script")
+console.debug("Running content script")
 
-setTimeout(() => {
-    console.log("Wait for complete loading of page")
+// setTimeout(() => {
+console.debug("Wait for complete loading of page")
 
-    const dom = document.documentElement.outerHTML
-    const url = window.location.href
+const dom = document.documentElement.outerHTML
+const url = window.location.href
 
-    browser.runtime.sendMessage({
-        url: url,
-        dom: dom,
-    })
-        .catch(e => `Cannot send citation: ${e.message}`)
+browser.runtime.sendMessage({
+    url: url,
+    dom: dom,
+})
+    .catch(e => `Cannot send citation: ${e.message}`)
 
-    console.log("Send params");
+console.debug("Send params");
 
-}, 256)
+// }, 256)
 

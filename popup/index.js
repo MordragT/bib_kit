@@ -1,7 +1,7 @@
-import init, { generate_citation } from "../html-meta/pkg/html_meta.js"
+import init, { Citation, Dom } from "../html-meta/pkg/html_meta.js"
 
 function registerCopyHandler() {
-    console.log("register copy handler")
+    console.debug("register copy handler")
     const text = document.getElementById("text")
 
     document.getElementById("copy").addEventListener("click", e => {
@@ -11,14 +11,16 @@ function registerCopyHandler() {
 
 async function registerMessageHandler() {
     await init()
-    console.log("loaded wasm module")
+    console.debug("loaded wasm module")
 
-    console.log("register message handler")
+    console.debug("register message handler")
     browser.runtime.onMessage.addListener(message => {
-        console.log(message)
+        console.debug(message)
         try {
-            const citation = generate_citation(message.dom, message.url)
-            browser.storage.local.set({ citation: citation })
+            const dom = new Dom(message.dom, message.url)
+            const citation = new Citation(dom)
+            const citation_yml = citation.to_yaml_str()
+            browser.storage.local.set({ citation: citation_yml })
             loadCitation()
         } catch (e) {
             console.error(e)
@@ -27,11 +29,11 @@ async function registerMessageHandler() {
 }
 
 function loadCitation() {
-    console.log("load citation")
+    console.debug("load citation")
     const text = document.getElementById("text")
 
     browser.storage.local.get("citation").then(obj => {
-        console.log(obj)
+        console.debug(obj)
         if (obj.citation != undefined) {
             text.textContent = obj.citation
         } else {
