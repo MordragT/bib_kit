@@ -16,7 +16,7 @@ scraper = "0.16"
 thiserror = "1.0"
 hayagriva = "0.3"
 url = "2.3"
-chrono = { version = "0.4", features = [ "wasmbind" ] }
+chrono = { version = "0.4" }
 console_error_panic_hook = "0.1.7"
 console_log = { version = "1", features = ["color"], optional = true }
 log = "0.4"
@@ -30,7 +30,7 @@ deunicode = "1.3"
 
 [features]
 default = ["wasm"]
-wasm = ["wasm-bindgen", "log/max_level_off", "console_log"]
+wasm = ["wasm-bindgen", "log/max_level_off", "console_log", "chrono/wasmbind"]
 
 [package.metadata.wasm-pack]
 wasm-opt = false

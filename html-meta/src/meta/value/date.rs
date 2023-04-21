@@ -29,8 +29,8 @@ impl From<DateIso8601> for Date {
     fn from(date_iso_8601: DateIso8601) -> Self {
         let date_time = date_iso_8601.date_time;
         Date {
-            day: Some(date_time.day() as u8),
-            month: Some(date_time.month() as u8),
+            day: Some(date_time.day() as u8 - 1),
+            month: Some(date_time.month() as u8 - 1),
             year: date_time.year(),
         }
     }
