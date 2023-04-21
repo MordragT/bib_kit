@@ -7,6 +7,7 @@ function sendParams() {
     console.debug(`BIB_KIT:sendParams: ${url}`);
 
     browser.runtime.sendMessage({
+        kind: "params",
         url: url,
         dom: dom,
     })
