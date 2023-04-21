@@ -11,6 +11,9 @@ citations in the `hayagriva` format.
 
 This extension is highly experimental. Bugs are expected.
 If you encounter any feel free to create issues.
+I do not recommend using the extension at this state.
+If you are curious however what is working so far you can install
+the extension [here](https://addons.mozilla.org/en-US/firefox/addon/bib-kit/)
 
 ## Screenshot
 
